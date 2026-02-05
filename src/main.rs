@@ -7,24 +7,38 @@ use color::Color;
 use ray::{ Ray, Point3 };
 use glam::DVec3;
 
-// --- HOW IT WORKS ---
+// --- RAYTRACER ALLGEMEIN ---
+// mehrere Rays die mit geometrischen Formen (in dem Fall nur Kugeln kollidieren)
+// Rays sind dargestellt in form einer gerade => einer Gleichung
+// heißt, für z.b die collision werden einfach immer Gleichungen gleichgestellt und aufgelöst
+
+// --- HOW HIT SPHERE WORKS ---
 // checks if the specifc ray hit a sphere by solving a quadratic equation, to check for any t (any moment of time while the ray is moving), where it could have intersected the sphere, bc 
 // ray.x^2 * ray.y^2 * ray.z^2 = radius^2 has to be satiesfied on a "collision"
 
+// gleichung für linie & gleichung für geometrisches objekt => nach x (pos) auflösen für wo, wenn es kollidiert wo es kollidiert
+
 // hoffe ich habs gecheckt ist viel zu kompliziert
 
-fn hit_sphere(center: Point3, radius: f64, r: &Ray) -> bool { 
-    let oc = r.origin() - center;
-    let a = r.direction().dot(r.direction());
-    let b = 2.0 * oc.dot(r.direction());
-    let c = oc.dot(oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
-    discriminant >= 0.0 // atleast 1 result: 1 result => ray only "touches" the sphere (intersects once); 2 results => ray goes "through" the sphere (intersects twice)
+fn hit_sphere(sphere_center: Point3, sphere_radius: f64, ray: &Ray) -> f64 { 
+    // insgesamt mache ich hier die quadratic equation also kommt das gleiche raus wie bei der pq - Formel
+    let oc = ray.origin() - sphere_center;
+    let a = ray.direction().dot(ray.direction());
+    let b = 2.0 * oc.dot(ray.direction());
+    let c = oc.dot(oc) - sphere_radius * sphere_radius;
+    let discriminant = b * b - 4.0 * a * c; // eigentlich müsste ich die wurzel ziehen aber ich weiß , wenn das positiv ist gibt es 2 Lösungen, wenn es 0 ist, eine Lösung und bei negativ keine Lösung
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-b - f64::sqrt(discriminant)) / (2.0 * a) // wenn positiv, hier die wurzel 
+    }
 }
  
 fn ray_color(r: &Ray) -> Color { // calculates the ray "color" based on the y coordinate (based of the height of the scene)
-    if hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, r) { // ob eine kugel bei 0.0, 0.0 -1.0 mit dem radius 0.5 getroffen wurde
-        return Color::new(1.0, 0.0, 0.0); // dann rot machen
+    let t = hit_sphere(Point3::new(0.0, 0.0, -1.0), 0.5, r);
+    if t > 0.0 {
+        let n = r.at(t).normalize() - DVec3::new(0.0, 0.0, -1.0);
+        return 0.5 * Color::new(n.x + 1.0, n.y + 1.0, n.z + 1.0);
     }
     let unit_direction = r.direction().normalize();
     let t = 0.5 * (unit_direction.y + 1.0);
