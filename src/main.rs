@@ -45,7 +45,7 @@ fn main() {
     // image measurements
 
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: i32 = 1200;
+    const IMAGE_WIDTH: i32 = 400;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 100;
     const MAX_DEPTH: i32 = 50; // limit für die rekursion von der erschaffung von neuen rays
@@ -53,8 +53,8 @@ fn main() {
     // world
 
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5))); // objects: if it looks confusing für later lennart: Box::new macht einen smartpointer, der dann auf etwas mit dem trait Hittable zeigt und der rest ist von selbst verständlich
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -105.0, 1.0), 100.0)));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
 
     // camera ( viewport)
 
