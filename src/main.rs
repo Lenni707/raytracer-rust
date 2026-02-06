@@ -6,15 +6,15 @@ mod ray;
 mod sphere;
 
 use std::io;
+use glam::DVec3;
 
 use crate::{
     hittable::{HitRecord, Hittable},
     hittable_list::HittableList,
+    color::Color,
+    ray::{Point3, Ray},
+    sphere::Sphere
 };
-use color::Color;
-use glam::DVec3;
-use ray::{Point3, Ray};
-use sphere::Sphere;
 
 // --- RAYTRACER ALLGEMEIN ---
 // mehrere Rays die mit geometrischen Formen (in dem Fall nur Kugeln kollidieren)
