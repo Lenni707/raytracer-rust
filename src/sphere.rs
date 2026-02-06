@@ -1,16 +1,20 @@
 use crate::hittable::{HitRecord, Hittable};
 use crate::ray::{Point3, Ray};
+use std::rc::Rc;
+use crate::material::Material;
 
 pub struct Sphere {
     sphere_center: Point3,
     sphere_radius: f64,
+    sphere_material: Rc<dyn Material>
 }
 
 impl Sphere {
-    pub fn new(cen: Point3, r: f64) -> Sphere {
+    pub fn new(cen: Point3, r: f64, m: Rc<dyn Material>) -> Sphere {
         Sphere {
             sphere_center: cen,
             sphere_radius: r,
+            sphere_material: m,
         }
     }
 }
@@ -46,6 +50,7 @@ impl Hittable for Sphere {
         hit_record.point = ray.at(hit_record.t);
         let outward_normal = (hit_record.point - self.sphere_center) / self.sphere_radius;
         hit_record.set_face_normal(ray, outward_normal);
+        rec.mat = Some(self.mat.clone());
 
         true // object was hit --> NEIN WAS OMG DESWEGEN TRUE 🤯 hab gerade emoji taste bei mac "gefunden" und wollte sie ausnutzen
     }

@@ -1,11 +1,14 @@
 use glam::DVec3;
+use std::rc::Rc; // lets multiple parts of the programm own a value, in this case: the trait Material
 
 use crate::ray::{Point3, Ray};
+use crate::materials::Material;
 
 #[derive(Clone, Default)]
 pub struct HitRecord {
     pub point: Point3,
     pub normal: DVec3,
+    pub material: Option<Rc<dyn Material>>,
     pub t: f64,
     pub front_face: bool,
 }

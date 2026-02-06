@@ -5,6 +5,7 @@ mod hittable_list;
 mod ray;
 mod sphere;
 mod camera;
+mod materials;
 
 use std::io;
 
