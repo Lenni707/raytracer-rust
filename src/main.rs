@@ -8,9 +8,10 @@ mod camera;
 mod materials;
 
 use std::io;
+use std::rc::Rc;
 
 use crate::{
-    camera::Camera, color::Color, helper_func::random_in_unit_sphere, hittable::{HitRecord, Hittable}, hittable_list::HittableList, ray::{Point3, Ray}, sphere::Sphere
+    camera::Camera, color::Color, hittable::{HitRecord, Hittable}, hittable_list::HittableList, ray::{Point3, Ray}, sphere::Sphere, materials::{Lambertian, Metal}
 };
 
 // --- RAYTRACER ALLGEMEIN ---
@@ -34,8 +35,12 @@ fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     }
     let mut rec = HitRecord::new();
     if world.hit(r, 0.001, helper_func::INFINITY, &mut rec) { // bei einer kollisions scattern die rays in eine random richtung
-        let dir = rec.normal + random_in_unit_sphere().normalize(); // random direction
-        return 0.5 * ray_color(&Ray::new(rec.point, dir), world, depth - 1) // SO TUFF EINFACH RECURSION
+        let mut atenuation = Color::default();
+        let mut scattered = Ray::default();
+        if rec.material.as_ref().unwrap().scatter(r, &rec, &mut atenuation, &mut scattered) {
+            return atenuation * ray_color(&scattered, world, depth - 1 ) // creates new rays based on the atenuation (dämpfung) of the material
+        }
+        return Color::new(0.0, 0.0, 0.0);
     }
     let unit_direction = r.direction().normalize();
     let t = 0.5 * (unit_direction.y + 1.0);
@@ -54,8 +59,32 @@ fn main() {
     // world
 
     let mut world = HittableList::new();
-    world.add(Box::new(Sphere::new(Point3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Box::new(Sphere::new(Point3::new(0.0, -100.5, -1.0), 100.0)));
+
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.8)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.4, 0.0, 0.8)));
+    let material_left = Rc::new(Metal::new(Color::new(0.1, 0.1, 0.1)));
+    let material_right = Rc::new(Metal::new(Color::new(0.1, 0.1, 0.1)));
+ 
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(0.0, 0.0, -1.0),
+        0.5,
+        material_center,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(-1.1, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.add(Box::new(Sphere::new(
+        Point3::new(1.1, 0.1, -1.0),
+        0.5,
+        material_right,
+    )));
 
     // camera ( viewport)
 

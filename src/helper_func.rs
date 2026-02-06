@@ -40,3 +40,12 @@ pub fn random_in_unit_sphere() -> DVec3 { // einfach so lange random machen bis 
         return p;
     }
 }
+
+pub fn is_near_zero(vec: DVec3) -> bool { // cehcks if a value is near zero to avoid floating point issues and direct opposites happening bc of random number generation
+    let limit = 1.0e-8;
+    vec[0].abs() < limit && vec[1].abs() < limit && vec[2].abs() < limit
+}
+
+pub fn reflect(vector: DVec3, surface_normal: DVec3) -> DVec3 { // ok so i dont know how to explain but bassicly the vector reflects just two times n upwards from a surface so it gets switched around like just reversing a velocity but taking. in. regard a surface normal
+    vector - 2.0 * vector.dot(surface_normal) * surface_normal
+}
