@@ -40,13 +40,16 @@ impl Material for Lambertian {
 }
 
 pub struct Metal {
-    albedo: Color
+    albedo: Color,
+    blur: f64 // 1.0 => very matte, 0.0 => very shiny
 }
 
 impl Metal {
-    pub fn new(a: Color) -> Metal {
+    pub fn new(color: Color, blur: f64) -> Metal {
         Metal {
-            albedo: a
+            albedo: color,
+            blur: if blur < 1.0 { blur } else { 1.0 }
+
         }
     }
 }
@@ -56,7 +59,7 @@ impl Material for Metal {
         let reflected = reflect(r_in.direction().normalize(), hitrecord.normal);
 
         *attenuation = self.albedo;
-        *scattered = Ray::new(hitrecord.point, reflected);
-        true        
+        *scattered = Ray::new(hitrecord.point, reflected + self.blur * random_in_unit_sphere()); // adds blur, which is random scatter, gets amplfied by self.blur
+        scattered.direction().dot(hitrecord.normal) > 0.0
     }
 }
