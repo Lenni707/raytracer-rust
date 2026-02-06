@@ -9,10 +9,11 @@ pub fn write_color(out: &mut impl Write, pixel_color: Color, samples_per_pixel: 
     let mut b = pixel_color.z;
 
     // divide the color by the number of samples for the median (durschschnitt)
+    // lowkey nicht gecheckt warum aber irgendwie müssen wir gamma correction machen ka irgendwie weird
     let scale = 1.0 / samples_per_pixel as f64;
-    r *= scale;
-    g *= scale;
-    b *= scale;
+    r = f64::sqrt(scale * r);
+    g = f64::sqrt(scale * g);
+    b = f64::sqrt(scale * b);
 
     let ir = (256. * r.clamp(0.0, 0.999)) as i32;
     let ig = (256. * g.clamp(0.0, 0.999)) as i32;

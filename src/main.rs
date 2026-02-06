@@ -7,15 +7,9 @@ mod sphere;
 mod camera;
 
 use std::io;
-use glam::DVec3;
 
 use crate::{
-    hittable::{HitRecord, Hittable},
-    hittable_list::HittableList,
-    color::Color,
-    ray::{Point3, Ray},
-    sphere::Sphere,
-    camera::Camera
+    camera::Camera, color::Color, helper_func::random_in_unit_sphere, hittable::{HitRecord, Hittable}, hittable_list::HittableList, ray::{Point3, Ray}, sphere::Sphere
 };
 
 // --- RAYTRACER ALLGEMEIN ---
@@ -33,10 +27,14 @@ use crate::{
 
 // hoffe ich habs gecheckt ist viel zu kompliziert
 
-fn ray_color(r: &Ray, world: &dyn Hittable) -> Color {
+fn ray_color(r: &Ray, world: &dyn Hittable, depth: i32) -> Color {
+    if depth <= 0 { // recursion depth so it cant go on forever or until it doesnt hit anything => STACK OVERFLOW OMG WAS HPI TUFF "DAS WÄRE DANN EIN STACK OVERFLOW 🤓"
+        return Color::new(0.0, 0.0, 0.0) // if depth is reached return black
+    }
     let mut rec = HitRecord::new();
-    if world.hit(r, 0.0, helper_func::INFINITY, &mut rec) {
-        return 0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0));
+    if world.hit(r, 0.001, helper_func::INFINITY, &mut rec) { // bei einer kollisions scattern die rays in eine random richtung
+        let dir = rec.normal + random_in_unit_sphere().normalize(); // random direction
+        return 0.5 * ray_color(&Ray::new(rec.point, dir), world, depth - 1) // SO TUFF EINFACH RECURSION
     }
     let unit_direction = r.direction().normalize();
     let t = 0.5 * (unit_direction.y + 1.0);
@@ -50,6 +48,7 @@ fn main() {
     const IMAGE_WIDTH: i32 = 1200;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 100;
+    const MAX_DEPTH: i32 = 50; // limit für die rekursion von der erschaffung von neuen rays
 
     // world
 
@@ -73,7 +72,7 @@ fn main() {
                 let u = (i as f64 + helper_func::random_double()) / (IMAGE_WIDTH -1) as f64;
                 let v = (j as f64 + helper_func::random_double()) / (IMAGE_HEIGHT -1) as f64;
                 let ray = cam.get_ray(u, v);
-                pixel_color += ray_color(&ray, &world);
+                pixel_color += ray_color(&ray, &world, MAX_DEPTH);
             }
             color::write_color(&mut io::stdout(), pixel_color, SAMPLES_PER_PIXEL);
         }
