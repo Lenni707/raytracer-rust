@@ -4,6 +4,7 @@ mod hittable;
 mod hittable_list;
 mod ray;
 mod sphere;
+mod camera;
 
 use std::io;
 use glam::DVec3;
@@ -13,7 +14,8 @@ use crate::{
     hittable_list::HittableList,
     color::Color,
     ray::{Point3, Ray},
-    sphere::Sphere
+    sphere::Sphere,
+    camera::Camera
 };
 
 // --- RAYTRACER ALLGEMEIN ---
@@ -21,8 +23,10 @@ use crate::{
 // Rays sind dargestellt in form einer gerade => einer Gleichung
 // heißt, für z.b die collision werden einfach immer Gleichungen gleichgestellt und aufgelöst
 
-// --- HOW HIT SPHERE WORKS ---
-// checks if the specifc ray hit a sphere by solving a quadratic equation, to check for any t (any moment of time while the ray is moving), where it could have intersected the sphere, bc
+// --- HOW HITING SPHERES WORK ---
+// checks if the specifc ray hit a sphere by solving a quadratic equation, to check for any t (any moment of time while the ray is moving), 
+// where it could have intersected the sphere, bc
+
 // ray.x^2 * ray.y^2 * ray.z^2 = radius^2 has to be satiesfied on a "collision"
 
 // gleichung für linie & gleichung für geometrisches objekt => nach x (pos) auflösen für wo, wenn es kollidiert wo es kollidiert
@@ -43,8 +47,9 @@ fn main() {
     // image measurements
 
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: i32 = 400;
+    const IMAGE_WIDTH: i32 = 1200;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
+    const SAMPLES_PER_PIXEL: i32 = 100;
 
     // world
 
@@ -54,15 +59,7 @@ fn main() {
 
     // camera ( viewport)
 
-    let viewport_height = 2.0;
-    let viewport_width = ASPECT_RATIO * viewport_height;
-    let focal_length = 1.0;
-
-    let origin = Point3::new(0.0, 0.0, 0.0);
-    let horizontal = DVec3::new(viewport_width, 0.0, 0.0);
-    let vertical = DVec3::new(0.0, viewport_height, 0.0);
-    let lower_left_corner =
-        origin - horizontal / 2.0 - vertical / 2.0 - DVec3::new(0.0, 0.0, focal_length);
+    let cam = Camera::new(ASPECT_RATIO);
 
     // rendering
 
@@ -71,14 +68,14 @@ fn main() {
     for j in (0..IMAGE_HEIGHT).rev() {
         eprint!("\rWorking, Line remaining: {} ", j);
         for i in 0..IMAGE_WIDTH {
-            let u = i as f64 / (IMAGE_WIDTH - 1) as f64;
-            let v = j as f64 / (IMAGE_HEIGHT - 1) as f64;
-            let r = Ray::new(
-                origin,
-                lower_left_corner + u * horizontal + v * vertical - origin,
-            );
-            let pixel_color = ray_color(&r, &world);
-            color::write_color(&mut io::stdout(), pixel_color);
+            let mut pixel_color = Color::new(0.0, 0.0, 0.0);
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + helper_func::random_double()) / (IMAGE_WIDTH -1) as f64;
+                let v = (j as f64 + helper_func::random_double()) / (IMAGE_HEIGHT -1) as f64;
+                let ray = cam.get_ray(u, v);
+                pixel_color += ray_color(&ray, &world);
+            }
+            color::write_color(&mut io::stdout(), pixel_color, SAMPLES_PER_PIXEL);
         }
     }
 
