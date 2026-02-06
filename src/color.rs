@@ -1,8 +1,8 @@
-use std::io::Write;
 use glam::DVec3;
+use std::io::Write;
 
 pub type Color = DVec3;
- 
+
 pub fn write_color(out: &mut impl Write, pixel_color: Color) {
     let r = (255.999 * pixel_color.x) as i32;
     let g = (255.999 * pixel_color.y) as i32;
