@@ -83,12 +83,21 @@ fn main() {
 
     // camera ( viewport)
 
+    let lookfrom = Point3::new(3.0, 3.0, 2.0);
+    let lookat = Point3::new(0.0, 0.0, -1.0);
+    let vup = Point3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = (lookfrom - lookat).length();
+    let vertical_fov: f64 = 30.0;
+    let aperture = 2.0; // tuffes englishes word: deutsch = apertur => lichtdurchlässige öffnung in optischen systemen. in dem fall einer linse. beschreibt hier die größe dieser öffnung
+ 
     let cam = Camera::new(
-        Point3::new(-2.0, 2.0, 1.0),
-        Point3::new(0.0, 0.0, -1.0),
-        Point3::new(0.0, 1.0, 0.0), // eigentlich ist es kein point sondern der vec der die "rotation" des camera planes festlegt
-        90.0, // 90 fov
-        ASPECT_RATIO
+        lookfrom,
+        lookat,
+        vup,
+        vertical_fov,
+        ASPECT_RATIO,
+        aperture,
+        dist_to_focus,
     );
 
     // rendering

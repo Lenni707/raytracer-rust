@@ -41,6 +41,20 @@ pub fn random_in_unit_sphere() -> DVec3 { // einfach so lange random machen bis 
     }
 }
 
+pub fn random_in_unit_disk() -> DVec3 {
+    loop {
+        let p = DVec3::new(
+            random_double_range(-1.0, 1.0),
+            random_double_range(-1.0, 1.0),
+            0.0
+        );
+        if p.length_squared() >= 1.0 {
+            continue;
+        }
+        return p;
+    }
+}
+
 pub fn is_near_zero(vec: DVec3) -> bool { // cehcks if a value is near zero to avoid floating point issues and direct opposites happening bc of random number generation
     let limit = 1.0e-8;
     vec[0].abs() < limit && vec[1].abs() < limit && vec[2].abs() < limit
