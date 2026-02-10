@@ -1,16 +1,17 @@
 use crate::hittable::{HitRecord, Hittable};
-use crate::ray::{Point3, Ray};
-use std::rc::Rc;
 use crate::materials::Material;
+use crate::ray::{Point3, Ray};
+
+use std::sync::Arc; // need to use arc, bc rc is not safe with multithreading
 
 pub struct Sphere {
     sphere_center: Point3,
     sphere_radius: f64,
-    sphere_material: Rc<dyn Material>
+    sphere_material: Arc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(cen: Point3, r: f64, m: Rc<dyn Material>) -> Sphere {
+    pub fn new(cen: Point3, r: f64, m: Arc<dyn Material>) -> Sphere {
         Sphere {
             sphere_center: cen,
             sphere_radius: r,

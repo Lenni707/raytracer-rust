@@ -1,14 +1,15 @@
 use glam::DVec3;
-use std::rc::Rc; // lets multiple parts of the programm own a value, in this case: the trait Material
+// lets multiple parts of the programm own a value, in this case: the trait Material
+use std::sync::Arc; // need to use arc, bc rc is not safe with multithreading
 
-use crate::ray::{Point3, Ray};
 use crate::materials::Material;
+use crate::ray::{Point3, Ray};
 
 #[derive(Clone, Default)]
 pub struct HitRecord {
     pub point: Point3,
     pub normal: DVec3,
-    pub material: Option<Rc<dyn Material>>,
+    pub material: Option<Arc<dyn Material>>,
     pub t: f64,
     pub front_face: bool,
 }
@@ -29,7 +30,8 @@ impl HitRecord {
     }
 }
 
-pub trait Hittable {
+pub trait Hittable: Send + Sync {
+    // impl send + sync for multithreading, to safely pass this trait to other threads
     // trait hittable, to implement for every hitable object -> mindblown 🤯
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rec: &mut HitRecord) -> bool;
 }
