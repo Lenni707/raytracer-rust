@@ -76,14 +76,20 @@ fn main() {
         Rc::new(Dielectric::new(1.5)))
     ));
     world.add(Box::new(Sphere::new( // right
-        Point3::new(1.1, 0.1, -1.0),
+        Point3::new(1.1, 0.0, -1.0),
         0.5,
         Rc::new(Metal::new(Color::new(0.1, 0.1, 0.1), 0.2)),
     )));
 
     // camera ( viewport)
 
-    let cam = Camera::new(ASPECT_RATIO);
+    let cam = Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        Point3::new(0.0, 1.0, 0.0), // eigentlich ist es kein point sondern der vec der die "rotation" des camera planes festlegt
+        90.0, // 90 fov
+        ASPECT_RATIO
+    );
 
     // rendering
 

@@ -1,4 +1,5 @@
 use crate::ray::{Point3, Ray};
+use crate::helper_func::degrees_to_radians;
 use glam::DVec3;
 
 pub struct Camera {
@@ -9,15 +10,26 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(aspect_ratio: f64) -> Self {
-        let viewport_height = 2.0;
+    pub fn new(
+        lookfrom: Point3,
+        lookat: Point3,
+        vector_up: Point3, // use (0, 1, 0) for normal horizontal level camera // vector_up descirbes the rotation of the camera so if its tilted or not
+        vertical_fov: f64, 
+        aspect_ratio: f64
+    ) -> Self {
+        let theta = degrees_to_radians(vertical_fov);
+        let h = f64::tan(theta / 2.0); // h is a ratio to the distance so h is the tan of the degrees/2
+        let viewport_height = 2.0 * h;
         let viewport_width = aspect_ratio * viewport_height;
-        let focal_length = 1.0;
+        
+        let w = (lookfrom - lookat).normalize();
+        let u = vector_up.cross(w).normalize();
+        let v = w.cross(u);
 
-        let origin = Point3::new(0.0, 0.0, 0.0);
-        let horizontal = DVec3::new(viewport_width, 0.0, 0.0);
-        let vertical = DVec3::new(0.0, viewport_height, 0.0);
-        let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - DVec3::new(0.0, 0.0, focal_length);
+        let origin = lookfrom;
+        let horizontal = viewport_width * u;
+        let vertical = viewport_height * v;
+        let lower_left_corner = origin - horizontal / 2.0 - vertical / 2.0 - w; // complex and i dont know how to explain but i think i get it
 
         Camera {
             origin,
