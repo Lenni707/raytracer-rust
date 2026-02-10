@@ -29,6 +29,8 @@ use crate::{
 // - zum shader machen (auf der gpu laufen lassen)
 // - vielleicht so ein interface oder so, damit mann einfacher objekte platzieren kann
 // - mit interface dann auf webassembly compelieren zum ausprobieren
+// - vielleicht ein kleine animation rendern (script schreiben, was jeden frame einzeln rendert hinterienander) => vielleicht erstmal gpu support adden
+// - shell script zum runnen und direklt umwandeln in .png mit ffmpeg
 
 // --- RAYTRACER ALLGEMEIN ---
 // mehrere Rays die mit geometrischen Formen (in dem Fall nur Kugeln kollidieren)
