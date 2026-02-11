@@ -76,7 +76,7 @@ fn main() {
     // image measurements
 
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
-    const IMAGE_WIDTH: i32 = 1200;
+    const IMAGE_WIDTH: i32 = 800;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as i32;
     const SAMPLES_PER_PIXEL: i32 = 500;
     const MAX_DEPTH: i32 = 50; // limit für die rekursion von der erschaffung von neuen rays
@@ -91,7 +91,7 @@ fn main() {
     let lookat = Point3::new(0.0, 0.0, 0.0);
     let vup = Point3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
-    let vertical_fov = 30.0;
+    let vertical_fov = 50.0;
     let aperture = 0.1;
 
     let cam = Camera::new(
